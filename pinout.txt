@@ -1,0 +1,5 @@
+Boot select terminal:
+GPIO0   GND   VCC
+
+Flash: GPIO <> GND
+Boot from flash: GPIO0 <> VCC

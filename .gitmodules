@@ -1,0 +1,6 @@
+[submodule "lib/sel"]
+	path = lib/sel
+	url = git@github.com:ubipo/les.git
+[submodule "lib/ubokeh"]
+	path = lib/ubokeh
+	url = git@github.com:ubipo/ubokeh.git

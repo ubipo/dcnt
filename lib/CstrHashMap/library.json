@@ -1,0 +1,8 @@
+{
+    "name": "CstrHashMap",
+    "description": "C-string Hash Map, adapted from https://github.com/aozturk/HashMap",
+    "include": "include",
+    "build": {
+        "flags": []
+    }
+}

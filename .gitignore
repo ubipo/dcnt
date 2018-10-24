@@ -1,0 +1,18 @@
+# Secrets
+src/secrets.h
+otaAuth.txt
+
+# Dolphin
+.directory
+
+# Platformio
+.pioenvs
+.piolibdeps
+.pioenvs
+
+# VS Code
+.clang_complete
+.gcc-flags.json
+.vscode/.browse.c_cpp.db*
+.vscode/c_cpp_properties.json
+.vscode/launch.json

@@ -1,0 +1,8 @@
+{
+    "name": "HashMap",
+    "description": "Hash Map, adapted from https://github.com/aozturk/HashMap",
+    "include": "include",
+    "build": {
+        "flags": []
+    }
+}
