@@ -2,18 +2,21 @@
 
 void setOtaHandlers() {
   ArduinoOTA.onStart([]() {
-    String type;
-    if (ArduinoOTA.getCommand() == U_FLASH) {
-      type = "sketch";
-    } else { // U_SPIFFS
-      type = "filesystem";
+    const char* type;
+    switch (ArduinoOTA.getCommand()) {
+      case U_FLASH:  type = "flash"; break;
+      case U_SPIFFS: type = "spiffs filesystem"; break;
+      case U_AUTH:   type = "auth"; break;
+      default:       type = "unknown";
     }
 
-    Serial.println("\nStart updating " + type);
+    Serial.println("\n=== Starting OTA update ===");
+    Serial.print("Writing to: ");
+    Serial.println(type);
   });
 
   ArduinoOTA.onEnd([]() {
-    Serial.println("\nEnd");
+    Serial.println("\nOTA update complete, rebooting...");
   });
 
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {

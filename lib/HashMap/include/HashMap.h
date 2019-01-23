@@ -19,6 +19,7 @@
 #include "HashNode.h"
 #include "ReinterpretCastHashFunc.h"
 #include "KeyCompFunc.h"
+#include "SingleRet.h"
 #include <cstddef>
 
 
@@ -49,21 +50,21 @@ public:
         }
     }
 
-    bool get(const K &key, V &value)
+    SingleRet<V> get(const K &key)
     {
         unsigned long hashValue = hashFunc(key);
         HashNode<K, V> *entry = table[hashValue];
 
         while (entry != nullptr) {
             if (compFunc(entry->getKey(), key)) {
-                value = entry->getValue();
-                return true;
+                V value = entry->getValue();
+                return SingleRet<V>{value, ERR_OK};
             }
 
             entry = entry->getNext();
         }
 
-        return false;
+        return SingleRet<V>{0, ERR_FAIL};;
     }
 
     void put(const K &key, const V &value)

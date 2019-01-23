@@ -4,3 +4,6 @@
 [submodule "lib/ubokeh"]
 	path = lib/ubokeh
 	url = git@github.com:ubipo/ubokeh.git
+[submodule "lib/euhm"]
+	path = lib/euhm
+	url = git@github.com:ubipo/euhm.git

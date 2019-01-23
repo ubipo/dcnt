@@ -1,5 +1,5 @@
 Boot select terminal:
-GPIO0   GND   VCC
+IO-stuff | GPIO0 | GND | VCC
 
-Flash: GPIO <> GND
+Flash: GPIO0 <> GND
 Boot from flash: GPIO0 <> VCC

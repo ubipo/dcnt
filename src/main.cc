@@ -5,11 +5,14 @@
 #include "CstrHashMap.h"
 #include "Logger.h"
 #include "SerialLogSink.h"
-#include "ErrDefs.h"
-#include "TlsLogSink.h"
+#include "Euhm.h"
+#include "StlsLogSink.h"
 #include "secrets.h"
 #include "otaHandlers.h"
+#include "Time.h"
 #include "time.h"
+#include "Ubokeh.h"
+#include "UhServer.h"
 
 const int baudRate = 115200;
 
@@ -22,73 +25,72 @@ const byte btn2Pin = 5;
 // Pin & Button settings
 // const byte fridgePin = relayPins[0];
 
-void setup() {
-  // Init Serial
+Dcnt* pDcnt;
+
+void initSerial() {
   Serial.begin(baudRate);
   Serial.print("\n\n");
-  Serial.println("=== DCNT - Dorm Controller 9000 ===");
-  Serial.print("Free sketch space: ");
+  Serial.println(F("=== DCNT - Dorm Controller 9000 ==="));
+  Serial.print(F("Free sketch space: "));
   Serial.println(ESP.getFreeSketchSpace());
+}
 
-  // Init WiFi
-  Serial.println(F("Connecting to WiFi..."));
+void initWiFi() {
+  Serial.println(F("* Connecting to WiFi..."));
   Serial.print(F("SSID: "));
   Serial.println(WIFI_SSID);
   WiFi.mode(WIFI_STA);
+  WiFi.hostname(F("DCNT_ESP8266"));
   WiFi.begin(WIFI_SSID, WIFI_PASS);
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("WiFi connection failed. Reboot in 5 seconds...");
+  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println(F("WiFi connection failed. Reboot in 5 seconds..."));
     delay(5000);
     ESP.restart();
   }
-  WiFi.hostname(F("ESP8266_DCNT"));
   Serial.print(F("IP address: "));
   Serial.println(WiFi.localIP());
+  Serial.println(F("+ Connected to WiFi"));
+}
 
-  // Init OTA server
-  Serial.println(F("Initialising OTA server..."));
+void initOtaUpdateServer() {
+  Serial.println(F("* Starting OTA update server..."));
   setOtaHandlers();
   ArduinoOTA.setPasswordHash(OTA_PASSWORD_HASH);
   ArduinoOTA.begin();
-  Serial.println(F("OTA server started"));
 
-  // Check for OTA update
-  Serial.println(F("Checking for OTA update..."));
-  for(size_t i = 0; i < 8; i++) {
+  Serial.print(F("Checking for OTA update"));
+  for(size_t i = 0; i < 16; i++) {
+    Serial.print(".");
     delay(250);
     ArduinoOTA.handle();
   }
-  Serial.println(F("No OTA update found"));
+  Serial.println(F("\nNo OTA update found"));
+  Serial.println(F("+ Started OTA update server"));
+}
 
-  // Sync time
-  Serial.println(F("Syncing time..."));
+void syncTime() {
+  Serial.println(F("* Syncing time..."));
   configTime(0, 0, "pool.ntp.org", "time.nist.gov");
   while (!time(nullptr)) {
     delay(1000);
   }
   time_t now = time(nullptr);
-  Serial.print(F("Time: "));
-  Serial.println(now);
+  Serial.printf("Time: %02i:%02i:%02i GMT\n", hour(now), minute(now), second(now));
+  Serial.println(F("+ Synced time"));
+}
 
-  // Init logger
-  Serial.println(F("Initialising logger..."));
-  Logger<2> logger;
-  SerialLogSink serialLogSink;
-  logger.registerSink(&serialLogSink);
-  TlsLogSink tlsLogSink(IPAddress(10,0,0,11), 5005);
-  logger.registerSink(&tlsLogSink);
-  logger.log(Sel::INFO, "SETUP", "Logger initialised");
+void setup() {
+  initSerial();
+  initWiFi();
+  initOtaUpdateServer();
+  syncTime();
 
-  for (byte i = 0; i < sizeof(relayPins); i++) {
-    pinMode(relayPins[i], OUTPUT);
-    digitalWrite(relayPins[i], LOW);
-  };
+  Serial.println(F("=== Bootstrap complete ==="));
 
-  digitalWrite(relayPins[1], HIGH);
-  digitalWrite(relayPins[2], HIGH);
-  digitalWrite(relayPins[3], HIGH);
+  pDcnt = new Dcnt();
+  pDcnt->init();
 
-  logger.log(Sel::INFO, "SETUP", "Setup complete");
+  return;
 };
 
 void loop() {
